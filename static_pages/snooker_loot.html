@@ -1,0 +1,287 @@
+<!-- snooker_loot.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Player CRUD Operations</title>
+    <!-- Include necessary styles and scripts -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+          crossorigin="anonymous">
+    <style>
+        img {
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        table, th, td {
+            border: 1px solid red;
+            border-collapse: collapse;
+        }
+        tr:nth-child(even) {
+            background-color: rgba(212, 178, 150, 0.4);
+        }
+        th:nth-child(even),td:nth-child(even) {
+            background-color: rgba(212, 178, 150, 0.4);
+        }
+        table.center {
+            margin-left: auto; 
+            margin-right: auto;
+        }
+        button.ex1 {
+        margin: 1% 5%;
+        }
+        button.ex2 {
+        margin: 1% 90%;
+        }
+    </style>
+</head>
+
+<body style="background-color: white;">
+
+<div id="create-update" style="display:none">
+    <br>
+    <h3 style="font-family: Arial; text-align: center; color: red;"><i>Add/Update Player</i></h3>
+    <br>
+    <table id="createUpdateForm" class="center">
+        <tr>
+            <td>ID</td>
+            <td><input type="hidden" name="ID" id="idInput"></td>
+        </tr>
+        <tr>
+            <td>Full Name</td>
+            <td><input type="text" name="Full_Name"></td>
+        </tr>
+        <tr>
+            <td>Age</td>
+            <td><input type="number" name="Age"></td>
+        </tr>
+        <tr>
+            <td>Nationality</td>
+            <td><input type="text" name="Nationality"></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>
+                <button id="create-button" onclick="doCreate()">Create</button>
+                <button id="update-button" onclick="doUpdate()">Update</button>
+                <button id="back-button" onclick="goBack()">Back</button>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<div id="display">
+    <br>
+    <h1 style="font-family: Arial; text-align: center; color: red; font-size: 40px">Players CRUD Operations</h1><br>
+    <!-- Add your player-related content here -->
+    <button class="ex1" onClick="Creating()">Add New Player</button>
+    <table id="playerTable" class="center" style="width: 90%">
+        <tr>
+            <th>ID</th>
+            <th>Full Name</th>
+            <th>Age</th>
+            <th>Nationality</th>
+            <th>Update</th>
+            <th>Delete</th>
+        </tr>
+        <!-- Add player data rows dynamically -->
+    </table>
+</div>
+
+<script>
+    // need to find a way to load all the data in the db once this page opens
+    
+    // buttons to be shown
+    function Creating() {
+        document.getElementById('display').style.display = "none";
+        document.getElementById('update-button').style.display = "none";
+        document.getElementById('create-button').style.display = "inline";
+        document.getElementById('create-update').style.display = "block";
+        document.getElementById('back-button').style.display = "inline";
+    }
+
+    function showUpdate(thisElem) {
+        var rowElement = thisElem.parentNode.parentNode;
+        Player = readPlayerFromRow(rowElement);
+        populateForm(Player);
+
+        document.getElementById('display').style.display = "none";
+        document.getElementById('update-button').style.display = "inline";
+        document.getElementById('create-button').style.display = "none";
+        document.getElementById('create-update').style.display = "block";
+        document.getElementById('back-button').style.display = "inline";
+    }
+
+    function readPlayerFromRow(rowElement) {
+        var Player = {};
+        Player.ID = rowElement.getAttribute("ID");
+        Player.Full_Name = rowElement.cells[1].firstChild.textContent;
+        Player.Age = rowElement.cells[2].firstChild.textContent;
+        Player.Nationality = rowElement.cells[3].firstChild.textContent;
+        return Player;
+    }
+
+    function populateForm(Player) {
+        var form = document.getElementById('createUpdateForm');
+        form.querySelector('input[name="ID"]').value = Player.ID;
+        form.querySelector('input[name="ID"]').disabled = true;
+        form.querySelector('input[name="Full_Name"]').value = Player.Full_Name;
+        form.querySelector('input[name="Age"]').value = Player.Age;
+        form.querySelector('input[name="Nationality"]').value = Player.Nationality;
+    }
+
+    function clearForm() {
+        var form = document.getElementById('createUpdateForm');
+        form.querySelector('input[name="ID"]').value = '';
+        form.querySelector('input[name="ID"]').disabled = false;
+        form.querySelector('input[name="Full_Name"]').value = '';
+        form.querySelector('input[name="Age"]').value = '';
+        form.querySelector('input[name="Nationality"]').value = '';
+    }
+
+    function doCreate() {
+        console.log("in doCreate");
+        var Player = getPlayerFromForm();
+        console.log(Player);
+        $.ajax({
+            url: "/players",
+            data: JSON.stringify(Player),
+            method: "POST",
+            dataType: "JSON",
+            contentType: "application/json; charset=utf-8",
+            success: function (result) {
+                console.log(result);
+                addPlayerToTable(Player);
+                showDisplay();
+                clearForm();
+            },
+            error: function (xhr, status, error) {
+                console.log("error" + error);
+            }
+        });
+    }
+
+    function doUpdate() {
+        var Player = getPlayerFromForm();
+        var rowElement = document.getElementById(Player.ID);
+        updateServer(Player);
+        updateTableRow(rowElement, Player);
+        clearForm();
+    }
+
+    function goBack() {
+        showDisplay();
+    }
+
+    function updateServer(Player) {
+        $.ajax({
+            url: "/players/" + Player.ID,
+            data: JSON.stringify(Player),
+            method: "PUT",
+            dataType: "JSON",
+            contentType: "application/json; charset=utf-8",
+            success: function (result) {
+                console.log(result);
+                updateTableRow(Player);
+                showDisplay();
+                clearForm();
+            },
+            error: function (xhr, status, error) {
+                console.log("error" + error);
+            }
+        });
+    }
+
+    function doDelete(thisElem) {
+        var tableElement = document.getElementById('playerTable');
+        var rowElement = thisElem.parentNode.parentNode;
+        var index = rowElement.rowIndex;
+        var ID = rowElement.getAttribute("ID");
+        $.ajax({
+            url: "/players/" + ID,
+            method: "DELETE",
+            dataType: "JSON",
+            success: function (result) {
+                tableElement.deleteRow(index);
+            },
+            error: function (xhr, status, error) {
+                console.log(error);
+            }
+        });
+    }
+
+    function updateTableRow(Player) {
+        var rowElement = document.getElementById(Player.ID);
+        rowElement.cells[1].firstChild.textContent = Player.Full_Name;
+        rowElement.cells[2].firstChild.textContent = Player.Age;
+        rowElement.cells[3].firstChild.textContent = Player.Nationality;
+    }
+
+    function getPlayerFromForm() {
+        var form = document.getElementById('createUpdateForm');
+        var Player = {};
+        Player.ID = form.querySelector('input[name="ID"]').value;
+        Player.Full_Name = form.querySelector('input[name="Full_Name"]').value;
+        Player.Age = form.querySelector('input[name="Age"]').value;
+        Player.Nationality = form.querySelector('input[name="Nationality"]').value;
+        return Player;
+    }
+
+    function showDisplay() {
+        document.getElementById('display').style.display = "block";
+        document.getElementById('create-update').style.display = "none";
+    }
+
+    function populateTable() {
+        var host = window.location.origin;
+        $.ajax({
+            url: host + '/players',
+            method: 'GET',
+            datatype: 'JSON',
+            success: function (results) {
+                for (var Player of results) {
+                    addPlayerToTable(Player);
+                }
+            },
+            error: function (xhr, status, error) {
+                console.log("error " + error + " code:" + status);
+            }
+        });
+        // example Player
+        // var Player = {
+        //     ID: NaN,
+        //     Full_Name: "Andrew Beatty",
+        //     Age: 25,
+        //     Nationality: "Irish",
+        // };
+        // addPlayerToTable(Player);
+    }
+
+    function addPlayerToTable(Player) {
+        var tableElem = document.getElementById("playerTable");
+        var rowElem = tableElem.insertRow(-1);
+        rowElem.setAttribute("ID", Player.ID);
+        var cell1 = rowElem.insertCell(0);
+        cell1.innerHTML = Player.ID;
+        var cell2 = rowElem.insertCell(1);
+        cell2.innerHTML = Player.Full_Name;
+        var cell3 = rowElem.insertCell(2);
+        cell3.innerHTML = Player.Age;
+        var cell4 = rowElem.insertCell(3);
+        cell4.innerHTML = Player.Nationality;
+        var cell5 = rowElem.insertCell(4);
+        cell5.innerHTML = '<button onclick="showUpdate(this)">Update</button>';
+        var cell6 = rowElem.insertCell(5);
+        cell6.innerHTML = '<button onclick="doDelete(this)">Delete</button>';
+    }
+
+    populateTable();
+</script>
+
+</body>
+
+</html>
