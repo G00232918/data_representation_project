@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify, render_template, redirect, url_for, abort
+from flask_httpauth import HTTPBasicAuth
 from playerDAO import PlayerDAO
 from playerStatsDAO import PlayerStatsDAO
 
@@ -7,21 +8,25 @@ app = Flask(__name__, static_url_path='', static_folder='static_pages')
 playerdao = PlayerDAO()
 playerstatsdao = PlayerStatsDAO()
 
-# @app.route('/login', methods=['GET', 'POST'])
-# def login():
-#     error = None
-#     if request.method == 'POST':
-#         if request.form['username'] != '' or request.form['password'] != '':
-#             username = request.form['username']
-#             password = request.form['password']
-#             foundUser = playerdao.checkUser(username, password)  
-#             if not foundUser:
-#                 error = 'Invalid Credentials. Please try again.'
+auth = HTTPBasicAuth()
 
-#         else:
-#             return error
-#     return render_template('login.html', error=error)
 
+# https://stackoverflow.com/questions/57218553/flask-restul-basic-authentication
+# login details defined
+USER_DATA = {
+    "user": "password"
+}
+
+@auth.verify_password
+def verify_password(username, password):
+    if username in USER_DATA and USER_DATA[username] == password:
+        return username
+
+# the login method is called and brings you to the login page
+@app.route('/login')
+@auth.login_required
+def login():
+    return render_template('login.html')
 
 @app.route('/players')
 def get_all_players():
