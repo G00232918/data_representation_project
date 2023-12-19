@@ -36,7 +36,7 @@ class PlayerDAO:
     # create Players entry
     def create(self, values):
         cursor = self.getCursor()
-        sql = "INSERT INTO players (Full_Name, Age, Nationality) VALUES (%s, %s, %s);"      
+        sql = "INSERT INTO players (Full_Name, Age, Nationality) VALUES (%s, %s, %s)"      
         cursor.execute(sql,(values["Full_Name"], values["Age"], values["Nationality"]))
         self.db.commit()
         newid = cursor.lastrowid
@@ -55,13 +55,19 @@ class PlayerDAO:
 
     def findByID(self, id):
         cursor = self.getCursor()
-        sql = "select * from players where id = %s"
+        sql = "SELECT * FROM players WHERE id = %s"
         values = (id,)
         cursor.execute(sql, values)
-        returnvalue = self.convertToDictionary(result)
-        result = cursor.fetchone()
+        result = cursor.fetchone()  
         self.closeAll()
-        return returnvalue
+        
+        if result:
+            print(f"No player found with ID: {id}")
+            return self.convertToDictionary(result)
+        
+        else:
+            return None
+
 
     # find the data for a particular year
     def findByNationality(self, Nationality):
@@ -117,5 +123,5 @@ class PlayerDAO:
         colnames=['Full_Name', 'Age', 'Nationality']
         player = {colname: result[idx] for idx, colname in enumerate(colnames)}
         return player
-
-PlayerDao = PlayerDAO()
+    
+playerDAO = PlayerDAO()

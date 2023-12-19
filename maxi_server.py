@@ -5,8 +5,8 @@ from playerStatsDAO import PlayerStatsDAO
 
 app = Flask(__name__, static_url_path='', static_folder='static')
 
-PlayerDao = PlayerDAO()
-PlayerStatsDao = PlayerStatsDAO()
+PlayerDAO = PlayerDAO()
+PlayerStatsDAO = PlayerStatsDAO()
 
 auth = HTTPBasicAuth()
 
@@ -27,14 +27,15 @@ def verify_password(username, password):
 def home():
     return app.send_static_file('snooker_loot.html')
     
+    
 @app.route('/players', methods=['GET'])
 def getAll():
-    results = PlayerDao.getAll()
+    results = PlayerDAO.getAll()
     return jsonify(results)
     
 @app.route('/players/<int:id>')
 def find_player_by_id(id):
-    found_player = PlayerDao.findByID(id)
+    found_player = PlayerDAO.findByID(id)
     if not found_player:
         abort(404)
     return jsonify(found_player)
@@ -66,12 +67,19 @@ def update(id):
     if 'Full_Name' in reqJson:
         foundPlayer['Full_Name'] = reqJson['Full_Name']
     if 'Age' in reqJson:
-        foundPlayer['Age'] = reqJson['Age']
-    if 'Year' in reqJson:
-        foundPlayer['Nationality'] = reqJson['Year']
-    values = (foundPlayer['Full_Name'],foundPlayer['Age'],foundPlayer['Nationality'],foundPlayer['id'])
+        try:
+            foundPlayer['Age'] = int(reqJson['Age'])
+        except ValueError:
+            abort(400)
+
+    if 'Nationality' in reqJson:
+        foundPlayer['Nationality'] = reqJson['Nationality']
+    values = (foundPlayer['Full_Name'], foundPlayer['Age'], foundPlayer['Nationality'], foundPlayer['id'])
     PlayerDAO.update(values)
     return jsonify(foundPlayer)
+
+
+
 
 @app.route('/players/<int:id>' , methods=['DELETE'])
 def delete(id):
@@ -83,7 +91,7 @@ def delete(id):
 @app.route('/playerstats')
 def getAllPlayerStats():
     try:
-        results = PlayerStatsDao.getAll()
+        results = PlayerStatsDAO.getAll()
         return jsonify(results)
     except Exception as e:
         print(f"Error getting playerstat: {e}")
@@ -91,7 +99,7 @@ def getAllPlayerStats():
 
 @app.route('/playerstats/<int:id>')
 def find_playerstats_by_id(id):
-    found_playerstats = PlayerStatsDao.findByID(id)
+    found_playerstats = PlayerStatsDAO.findByID(id)
     if not found_playerstats:
         abort(400)
     return jsonify(found_playerstats)

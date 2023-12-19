@@ -66,7 +66,7 @@ class PlayerStatsDAO:
     
     def update(self, values):
         cursor = self.getcursor()
-        sql="update playerstats set Full_Name= %s,Prize_Monay=%s, price=%s  where id = %s"
+        sql="update playerstats set Full_Name= %s,Prize_Money=%s, price=%s  where id = %s"
         cursor.execute(sql, values)
         self.connection.commit()
         self.closeAll()
@@ -88,6 +88,5 @@ class PlayerStatsDAO:
         colnames=['Full_Name', 'Prize_Money', 'Year']
         playerStat = {colname: result[idx] for idx, colname in enumerate(colnames)}
         return playerStat
-       
-
-PlayerStatsDao = PlayerStatsDAO()
+    
+playerStatsDAO = PlayerStatsDAO()

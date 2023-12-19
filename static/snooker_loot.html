@@ -35,7 +35,7 @@
         <h2><span id="createPlayerLabel">Create a Player</span><span id="updatePlayerLabel" style="display: none;">Update</span> Player</h2>
         <input type="hidden" id="playerId"/>
         Full_Name <input type="text" id="playerFullName" /><br/>
-        Age <input type="text" id="playerAge"/> <br/>
+        Age <input type="number" id="playerAge"/> <br/>
         Nationality <input type="text" id="playerNationality"/> <br/>
         <button id="doCreatePlayerButton" class="btn btn-primary" onclick="doCreate()">Create Player</button>
         <button id="doUpdatePlayerButton" class="btn btn-warning" style="display: none;" onclick="doUpdate()">Update Player</button>
@@ -61,61 +61,61 @@
             </tbody>
         </table>
     </div>
-    <div id='createUpdatePlayerStatForm' style="display: none">
+    <div id="createUpdatePlayerStatForm" style="display: none">
         <h2><span id="createPlayerStatLabel">Create a Player</span><span id="updatePlayerStatLabel" style="display: none;">Update</span> Player</h2>
         <input type="hidden" id="playerStatId"/>
-        Prize_Money <input type="text" id="playerStatPrizeMoney"/> <br/>
-        Year <input type="text" id="playerStatYear" /><br/>
+        Prize_Money <input type="number" id="playerStatPrizeMoney"/> <br/>
+        Year <input type="number" id="playerStatYear" /><br/>
         <button id="doCreatePlayerStatButton" class="btn btn-primary" onclick="doCreate()">Create PlayerStat</button>
         <button id="doUpdatePlayerStatButton" class="btn btn-warning" style="display: none;" onclick="doUpdate()">Update PlayerStat</button>
     </div>
 
     <!-- Player JavaScript -->
     <script>
-        function showCreate(){
-            document.getElementById('showCreatePlayerButton').style.display="none";
-            document.getElementById('playerTable').style.display="none";
-            document.getElementById('createUpdatePlayerForm').style.display="block";
+        function showCreate() {
+            document.getElementById('showCreatePlayerButton').style.display = "none";
+            document.getElementById('playerTable').style.display = "none";
+            document.getElementById('createUpdatePlayerForm').style.display = "block";
 
-            document.getElementById('createPlayerLabel').style.display="inline";
-            document.getElementById('updatePlayerLabel').style.display="none";
+            document.getElementById('createPlayerLabel').style.display = "inline";
+            document.getElementById('updatePlayerLabel').style.display = "none";
 
-            document.getElementById('doCreatePlayerButton').style.display="block";
-            document.getElementById('doUpdatePlayerButton').style.display="none";
+            document.getElementById('doCreatePlayerButton').style.display = "block";
+            document.getElementById('doUpdatePlayerButton').style.display = "none";
         }
 
-        function showViewAll(){
-            document.getElementById('showCreatePlayerButton').style.display="block";
-            document.getElementById('playerTable').style.display="block";
-            document.getElementById('createUpdatePlayerForm').style.display="none";
+        function showViewAll() {
+            document.getElementById('showCreatePlayerButton').style.display = "block";
+            document.getElementById('playerTable').style.display = "block";
+            document.getElementById('createUpdatePlayerForm').style.display = "none";
         }
 
-        function showUpdate(buttonElement){
-            document.getElementById('showCreatePlayerButton').style.display="none";
-            document.getElementById('playerTable').style.display="none";
-            document.getElementById('createUpdatePlayerForm').style.display="block";
+        function showUpdate(buttonElement) {
+            document.getElementById('showCreatePlayerButton').style.display = "none";
+            document.getElementById('playerTable').style.display = "none";
+            document.getElementById('createUpdatePlayerForm').style.display = "block";
 
-            document.getElementById('createPlayerLabel').style.display="none";
-            document.getElementById('updatePlayerLabel').style.display="inline";
+            document.getElementById('createPlayerLabel').style.display = "none";
+            document.getElementById('updatePlayerLabel').style.display = "inline";
 
-            document.getElementById('doCreatePlayerButton').style.display="none";
-            document.getElementById('doUpdatePlayerButton').style.display="block";
+            document.getElementById('doCreatePlayerButton').style.display = "none";
+            document.getElementById('doUpdatePlayerButton').style.display = "block";
 
             var rowElement = buttonElement.parentNode.parentNode;
             var player = getPlayerFromRow(rowElement);
             populateFormWithPlayer(player);
         }
 
-        function doCreate(){
+        function doCreate() {
             var form = document.getElementById('createUpdatePlayerForm');
             var player = {};
             player.Full_Name = form.querySelector('input[id="playerFullName"]').value;
-            player.Age = form.querySelector('input[id="playerAge"]').value;
+            player.Age = parseInt(form.querySelector('input[id="playerAge"]').value); // Convert to integer
             player.Nationality = form.querySelector('input[id="playerNationality"]').value;
             createPlayerAjax(player);
         }
 
-        function doUpdate(){
+        function doUpdate() {
             var player = getPlayerFromForm();
             var rowElement = document.getElementById(player.id);
             updatePlayerAjax(player);
@@ -124,7 +124,7 @@
             showViewAll();
         }
 
-        function doDelete(){
+        function doDelete() {
             var tableElement = document.getElementById('playerTable');
             var rowElement = this.parentNode.parentNode;
             var index = rowElement.rowIndex;
@@ -132,32 +132,28 @@
             tableElement.deleteRow(index);
         }
 
-        function addPlayerToTable(player){
+        function addPlayerToTable(playerData) {
             var tableElement = document.getElementById('playerTable');
             var rowElement = tableElement.insertRow(-1);
-            rowElement.setAttribute('id', player.id);
-            var cell1 = rowElement.insertCell(0);
-            cell1.innerHTML = player.id;
-            var cell2 = rowElement.insertCell(1);
-            cell2.innerHTML = player.Full_Name;
-            var cell3 = rowElement.insertCell(2);
-            cell3.innerHTML = player.Age;
-            var cell4 = rowElement.insertCell(3);
-            cell4.innerHTML = player.Nationality;
-            var cell5 = rowElement.insertCell(4);
-            cell5.innerHTML = '<button onclick="showUpdate(this)">Update</button>';
-            var cell6 = rowElement.insertCell(5);
-            cell6.innerHTML = '<button onclick="doDelete()">Delete</button>';
+            rowElement.setAttribute('id', playerData[0]);
+            for (var i = 0; i < playerData.length; i++) {
+                var cell = rowElement.insertCell(i);
+                cell.innerHTML = playerData[i];
+            }
+            var updateCell = rowElement.insertCell(playerData.length);
+            updateCell.innerHTML = '<button onclick="showUpdate(this)">Update</button>';
+            var deleteCell = rowElement.insertCell(playerData.length + 1);
+            deleteCell.innerHTML = '<button onclick="doDelete()">Delete</button>';
         }
 
-        function clearForm(){
+        function clearForm() {
             var form = document.getElementById('createUpdatePlayerForm');
             form.querySelector('input[id="playerFullName"]').value = '';
             form.querySelector('input[id="playerAge"]').value = '';
             form.querySelector('input[id="playerNationality"]').value = '';
         }
 
-        function getPlayerFromRow(rowElement){
+        function getPlayerFromRow(rowElement) {
             var player = {};
             player.id = rowElement.getAttribute('id');
             player.Full_Name = rowElement.cells[1].innerHTML;
@@ -166,14 +162,14 @@
             return player;
         }
 
-        function setPlayerInRow(rowElement, player){
+        function setPlayerInRow(rowElement, player) {
             rowElement.cells[0].innerHTML = player.id;
             rowElement.cells[1].innerHTML = player.Full_Name;
             rowElement.cells[2].innerHTML = player.Age;
             rowElement.cells[3].innerHTML = player.Nationality;
         }
 
-        function populateFormWithPlayer(player){
+        function populateFormWithPlayer(player) {
             var form = document.getElementById('createUpdatePlayerForm');
             form.querySelector('input[id="playerId"]').disabled = true;
             form.querySelector('input[id="playerId"]').value = player.id;
@@ -182,12 +178,12 @@
             form.querySelector('input[id="playerNationality"]').value = player.Nationality;
         }
 
-        function getPlayerFromForm(){
+        function getPlayerFromForm() {
             var form = document.getElementById('createUpdatePlayerForm');
             var player = {};
             player.id = form.querySelector('input[id="playerId"]').value;
             player.Full_Name = form.querySelector('input[id="playerFullName"]').value;
-            player.Age = form.querySelector('input[id="playerAge"]').value;
+            player.Age = parseInt(form.querySelector('input[id="playerAge"]').value); 
             player.Nationality = form.querySelector('input[id="playerNationality"]').value;
             return player;
         }
@@ -197,65 +193,67 @@
                 url: "http://127.0.0.1:5000/players",
                 method: "GET",
                 dataType: "JSON",
-                success: (result) => {
-                    result.forEach((players) => addPlayerToTable(players));
+                success: function(result) {
+                    console.log("Success:", result);
+                    result.forEach(function(players) {
+                        addPlayerToTable(players);
+                    });
                 },
-                error: (xhr, status, error) => {
-                    console.log(`Error: ${status}, Message: ${error}`);
+                error: function(xhr, status, error) {
+                    console.log("Error:", status, "Message:", error);
                 }
             });
         }
 
-
-        function createPlayerAjax(player){
+        function createPlayerAjax(player) {
             console.log(JSON.stringify(player));
             $.ajax({
-                "url": "http://127.0.0.1:5000/players",
-                "method": "POST",
-                "data": JSON.stringify(player),
-                "dataType": "JSON",
+                url: "http://127.0.0.1:5000/players",
+                method: "POST",
+                data: JSON.stringify(player),
+                dataType: "JSON",
                 contentType: "application/json; charset=utf-8",
-                "success": function(result){
+                success: function(result) {
                     player.id = result.id;
                     addPlayerToTable(player);
                     clearForm();
                     showViewAll();
                 },
-                "error": function(xhr, status, error){
-                    console.log("error: " + status + " msg:" + error);
+                error: function(xhr, status, error) {
+                    console.log("Error:", status, "Message:", error);
                 }
             });
         }
 
-        function updatePlayerAjax(player){
-            console.log(JSON.stringify(player));
+        function updatePlayerAjax(player) {
+            console.log("Player Data:", player);
             $.ajax({
-                "url": "http://127.0.0.1:5000/players/" + encodeURI(player.id),
-                "method": "PUT",
-                "data": JSON.stringify(player),
-                "dataType": "JSON",
+                url: "http://127.0.0.1:5000/players/" + encodeURI(player.id),
+                method: "PUT",
+                data: JSON.stringify(player),
+                dataType: "json",
                 contentType: "application/json; charset=utf-8",
-                "success": function(result){
-                    // console.log(result);
+                success: function(result) {
+                    console.log("Success:", result);
                 },
-                "error": function(xhr, status, error){
-                    console.log("error: " + status + " msg:" + error);
+                error: function(xhr, status, error) {
+                    console.log("Error:", status, "Message:", error);
                 }
             });
         }
 
-        function deletePlayerAjax(id){
+        function deletePlayerAjax(id) {
             $.ajax({
-                "url": "http://127.0.0.1:5000/players/" + encodeURI(id),
-                "method": "DELETE",
-                "data": "",
-                "dataType": "JSON",
+                url: "http://127.0.0.1:5000/players/" + encodeURI(id),
+                method: "DELETE",
+                data: "",
+                dataType: "JSON",
                 contentType: "application/json; charset=utf-8",
-                "success": function(result){
+                success: function(result) {
                     // console.log(result);
                 },
-                "error": function(xhr, status, error){
-                    console.log("error: " + status + " msg:" + error);
+                error: function(xhr, status, error) {
+                    console.log("Error:", status, "Message:", error);
                 }
             });
         }
