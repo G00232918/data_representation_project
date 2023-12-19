@@ -2,6 +2,13 @@ import mysql.connector
 import dbconfig as cfg
 
 class PlayerStatsDAO:
+
+    connection=""
+    cursor =''
+    host=       ''
+    user=       ''
+    password=   ''
+    database=   ''
     
     def __init__(self):
         self.db = mysql.connector.connect(
@@ -30,8 +37,7 @@ class PlayerStatsDAO:
     def create(self,values):
         cursor = self.getCursor()
         sql = "INSERT INTO playerstats (Full_Name, Prize_Money, Year) VALUES (%s, %s, %s)"      
-        cursor.execute(sql, values)
-
+        cursor.execute(sql,(values["Full_Name"], values["Prize_Money"], values["Year"]))
         self.connection.commit()
         newid = cursor.lastrowid
         self.closeAll()
@@ -54,19 +60,17 @@ class PlayerStatsDAO:
 
         cursor.execute(sql, values)
         result = cursor.fetchone()
+        returnvalue = self.convertToDictionary(result)
         self.closeAll()
-        return result
+        return returnvalue
+    
+    def update(self, values):
+        cursor = self.getcursor()
+        sql="update playerstats set Full_Name= %s,Prize_Monay=%s, price=%s  where id = %s"
+        cursor.execute(sql, values)
+        self.connection.commit()
+        self.closeAll()
 
-    # find the data for a particular year
-    def findByYear(self, Year):
-            cursor = self.db.cursor()
-            sql = "SELECT * FROM playerstats WHERE Year = %s"
-            values = (Year,)
-
-            cursor.execute(sql, values)
-            result = cursor.fetchone()
-            self.closeAll()
-            return result
 
     # delete entry by id
     def delete(self, id):
@@ -75,6 +79,15 @@ class PlayerStatsDAO:
         values = (id,)
         cursor.execute(sql, values)
         self.connection.commit()
-        self.closeAll
+        self.closeAll()
+        print("delete done")
 
-playerstatsdao = PlayerStatsDAO()
+
+
+    def convertToDictionary(self, result):
+        colnames=['Full_Name', 'Prize_Money', 'Year']
+        playerStat = {colname: result[idx] for idx, colname in enumerate(colnames)}
+        return playerStat
+       
+
+PlayerStatsDao = PlayerStatsDAO()
