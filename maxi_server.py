@@ -40,6 +40,7 @@ def find_player_by_id(id):
         abort(404)
     return jsonify(found_player)
 
+
 @app.route('/players', methods=['POST'])
 def create_player():
     if not request.json:
@@ -57,6 +58,7 @@ def create_player():
 @app.route('/players/<int:id>', methods=['PUT'])
 def update(id):
     foundPlayer = PlayerDAO.findByID(id)
+    print(str(foundPlayer))
     if not foundPlayer:
         abort(404)
     if not request.json:
@@ -74,11 +76,9 @@ def update(id):
 
     if 'Nationality' in reqJson:
         foundPlayer['Nationality'] = reqJson['Nationality']
-    values = (foundPlayer['Full_Name'], foundPlayer['Age'], foundPlayer['Nationality'], foundPlayer['id'])
+    values = (foundPlayer['Full_Name'], foundPlayer['Age'], foundPlayer['Nationality'], foundPlayer['ID'])
     PlayerDAO.update(values)
     return jsonify(foundPlayer)
-
-
 
 
 @app.route('/players/<int:id>' , methods=['DELETE'])
@@ -91,60 +91,13 @@ def delete(id):
 @app.route('/playerstats')
 def getAllPlayerStats():
     try:
-        results = PlayerStatsDAO.getAll()
+        results = PlayerStatsDAO.find_cumulative_prize_by_year()
         return jsonify(results)
     except Exception as e:
-        print(f"Error getting playerstat: {e}")
+        print(f"Error getting playerstats: {e}")
         abort(500)
 
-@app.route('/playerstats/<int:id>')
-def find_playerstats_by_id(id):
-    found_playerstats = PlayerStatsDAO.findByID(id)
-    if not found_playerstats:
-        abort(400)
-    return jsonify(found_playerstats)
 
-@app.route('/playerstats', methods=['POST'])
-def create_playerstats():
-    if not request.json:
-        abort(400)
-    playerstat = {
-        "Full_Name": request.json["Full_Name"],
-        "Prize_Money": request.json["Prize_Money"],
-        "Year": request.json["Year"],
-    }
-    values =(playerstat['Full_Name'],playerstat['Prize_Money'],playerstat['Year'])
-    newId = PlayerDAO.create(values)
-    playerstat['id'] = newId
-    return jsonify(playerstat)
-
-@app.route('/playerstats/<int:id>', methods=['PUT'])
-def update_playerstat(id):
-    foundPlayer = PlayerStatsDAO.findByID(id)
-    if not foundPlayer:
-        abort(404)
-    
-    if not request.json:
-        abort(400)
-    reqJson = request.json
-    if 'Prize_Money' in reqJson and type(reqJson['Prize_Money']) is not int:
-        abort(400)
-    if 'Year' in reqJson and type(reqJson['Year']) is not int:
-        abort(400)
-    if 'Full_Name' in reqJson:
-        foundPlayer['Full_Name'] = reqJson['Full_Name']
-    if 'Prize_Money' in reqJson:
-        foundPlayer['Prize_Money'] = reqJson['Prize_Money']
-    if 'Year' in reqJson:
-        foundPlayer['Year'] = reqJson['Year']
-    values = (foundPlayer['Full_Name'],foundPlayer['Prize_Money'],foundPlayer['Year'],foundPlayer['id'])
-    PlayerDAO.update(values)
-    return jsonify(foundPlayer)
-
-@app.route('/players/<int:id>' , methods=['DELETE'])
-def delete_playerstat(id):
-    PlayerStatsDAO.delete(id)
-    return jsonify({"done":True})
 
 if __name__ == "__main__":
     app.run(debug=True)
