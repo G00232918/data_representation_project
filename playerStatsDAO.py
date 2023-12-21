@@ -33,31 +33,33 @@ class PlayerStatsDAO:
         self.connection.close()
         self.cursor.close()
 
-    def find_cumulative_prize_by_year(self,ID,Full_Name,Total_Prize_Money):
+    def find_cumulative_prize_by_year(self):
         cursor = self.db.cursor()
-        print(str("James"))
-        # Modify the SQL query to join both tables and filter by player's full name
+
+        # SQL query to join both tables to get total prize money
         sql = """
             SELECT p.ID, p.Full_Name, p.Age, p.Nationality,
-                SUM(ps.Prize_Money) AS Cumulative_Total_Prize_Money
+                   SUM(ps.Prize_Money) AS Total_Prize_Money
             FROM players p
             JOIN playerstats ps ON p.Full_Name = ps.Full_Name
-            WHERE p.Full_Name = %s
-            GROUP BY p.ID, p.Full_Name, p.Age, p.Nationality
+            group by p.ID, p.Full_Name, p.Age, p.Nationality
         """
-        values = (ID,Full_Name,Total_Prize_Money)
-        cursor.execute(sql,values)
-        returnvalue = self.convertToDictionary1(result)
-        print(result)
+        #values = (ID,Full_Name, Total_Prize_Money)
+        cursor.execute(sql)
         result = cursor.fetchall()
-        self.closeAll()
-        return returnvalue
+        return result
+    
 
 
+    # function to map column names to their values in a row
     def convertToDictionary(self, result):
-        colnames=['Full_Name', 'Prize_Money', 'Year']
+        colnames=['ID', 'Full_Name', 'Total_Prize_Money']
+        # iterating through rows creaing keyvalue pair
         playerStat = {colname: result[idx] for idx, colname in enumerate(colnames)}
         return playerStat
     
     
 playerStatsDAO = PlayerStatsDAO()
+
+# Reference
+# Lecture Notes

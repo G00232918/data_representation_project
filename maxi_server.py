@@ -11,7 +11,6 @@ PlayerStatsDAO = PlayerStatsDAO()
 auth = HTTPBasicAuth()
 
 
-# https://stackoverflow.com/questions/57218553/flask-restul-basic-authentication
 # login details defined
 USER_DATA = {
     "user": "password"
@@ -101,3 +100,7 @@ def getAllPlayerStats():
 
 if __name__ == "__main__":
     app.run(debug=True)
+
+# References 
+# Lecture Notes
+# Login function - # https://stackoverflow.com/questions/57218553/flask-restul-basic-authentication

@@ -53,6 +53,8 @@ class PlayerDAO:
         self.closeAll()
         return result
 
+    # find player from players table by searching by ID
+    # test with - curl http://127.0.0.1:5000/players/1
     def findByID(self, id):
         cursor = self.getCursor()
         sql = "SELECT * FROM players WHERE id = %s"
@@ -60,7 +62,7 @@ class PlayerDAO:
         cursor.execute(sql, values)
         result = cursor.fetchone()  
         self.closeAll()
-        
+        # error when an ID doesn't exist is entered
         if result:
             print(f"No player found with ID: {id}")
             return self.convertToDictionary(result)
@@ -68,27 +70,18 @@ class PlayerDAO:
         else:
             return None
 
-
-    # find the data for a particular year
-    def findByNationality(self, Nationality):
-        cursor = self.db.cursor()
-        sql = "SELECT * FROM player WHERE Nationality = %s"
-        values = (Nationality,)
-        cursor.execute(sql, values)
-        returnvalue = self.convertToDictionary(result)
-        result = cursor.fetchall()
-        self.closeAll()
-        return returnvalue
     
+    # update playere
     def update(self, values):
         cursor = self.getCursor()
+        # where id is to get an existing player with id
         sql="update players set Full_Name= %s,Age=%s, Nationality=%s  where id = %s"
         cursor.execute(sql, values)
         self.connection.commit()
         self.closeAll()
 
     
-    # delete entry by id
+    # delete player 
     def delete(self, id):
         cursor = self.getCursor()
         sql="delete from players where id = %s"
@@ -98,10 +91,14 @@ class PlayerDAO:
         self.closeAll()
         print("delete done")
 
-    
+    # function to map column names to their values in a row
     def convertToDictionary(self, result):
         colnames=['ID', 'Full_Name', 'Age', 'Nationality']
+        # iterating through rows creaing key value pair
         player = {colname: result[idx] for idx, colname in enumerate(colnames)}
         return player
     
 playerDAO = PlayerDAO()
+
+# References 
+# Lecture Notes

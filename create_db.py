@@ -73,3 +73,7 @@ finally:
         cursor.close()
         connection.close()
         print("Connection closed.")
+
+# References
+# Lecture Notes
+# Read in csv - other module projects
