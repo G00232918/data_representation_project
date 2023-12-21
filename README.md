@@ -24,7 +24,7 @@ It needed the following requirements -
 * .gitignore
 * create_db.py - Python program to create the tables in the data_rep DB.
 * dbconfig.py - SQL connection details.
-* max_server.py - This program is a Flask-based web application designed to serve as an
+* maxi_server.py - This program is a Flask-based web application designed to serve as an
 API for managing information related to players and their statistics.
 * README.md
 -playerDAO.py - Program containing a Data Access Object (DAO) class for interacting with a MySQL database for players table. 
@@ -36,7 +36,7 @@ API for managing information related to players and their statistics.
 - MySQL 
 - cmdr
 
-#### How to clone data_representatin_project repository
+#### How to clone data_representation_project repository
 On GitHub at https://github.com/G00232918/data_representation_project.git, click the green Code button, copy the URL for the repository. 
 
 Open your python package, change the current working directory to the location where you want the cloned directory, type git clone, and then paste the URL. Press Enter to create your local clone.
@@ -54,8 +54,8 @@ Open your python package, change the current working directory to the location w
 * Run maxi_server.py
 * Copy the URL in the cmdr terminal in your chosen browser.
 * Login details:
-Username - User
-Password -Password
+Username - user
+Password -password
 
 
 ### How to run it on pythonanywhere
@@ -63,10 +63,10 @@ Password -Password
 * You can access via https://jamesconnolly147.pythonanywhere.com/
 
 * Login details:
-Username - User
-Password -Password
+Username - user
+Password - password
 
-#### How to clone data_representatin_project repository
+#### How to clone pythonanywhere repository
 On GitHub at https://github.com/G00232918/deploytopythonanywhere.git, click the green Code button, copy the URL for the repository. 
 
 Open your python package, change the current working directory to the location where you want the cloned directory, type git clone, and then paste the URL. Press Enter to create your local clone.
