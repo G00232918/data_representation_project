@@ -54,8 +54,8 @@ Open your python package, change the current working directory to the location w
 * Run maxi_server.py
 * Copy the URL in the cmdr terminal in your chosen browser.
 * Login details:
-Username - user
-Password -password
+1. Username - user
+2. Password -password
 
 
 ### How to run it on pythonanywhere
@@ -63,8 +63,8 @@ Password -password
 * You can access via https://jamesconnolly147.pythonanywhere.com/
 
 * Login details:
-Username - user
-Password - password
+1. Username - user
+2. Password - password
 
 #### How to clone pythonanywhere repository
 On GitHub at https://github.com/G00232918/deploytopythonanywhere.git, click the green Code button, copy the URL for the repository. 
